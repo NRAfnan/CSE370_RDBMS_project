@@ -1,0 +1,11 @@
+# Sensitive files
+.env
+db.sqlite3
+
+# Compiled files
+__pycache__/
+*.pyc
+
+# Deployment scripts
+deploy.sh
+deploy.bat
