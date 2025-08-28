@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+
+{% block title %}Elder Profiles - Special Care Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="fas fa-users me-2"></i>Elder Profiles
+    </h1>
+    <a href="{% url 'elder_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add New Elder
+    </a>
+</div>
+
+<!-- Search and Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                {{ search_form.query }}
+            </div>
+            <div class="col-md-3">
+                {{ search_form.category }}
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+        
+        {% if query %}
+        <div class="mt-3">
+            <small class="text-muted">
+                Showing results for "{{ query }}" 
+                {% if category != 'all' %}in {{ category }}{% endif %}
+                <a href="{% url 'elder_list' %}" class="ms-2 text-decoration-none">Clear search</a>
+            </small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Elder Profiles Grid -->
+{% if elders %}
+    <div class="row g-4">
+        {% for elder in elders %}
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 elder-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>{{ elder.full_name }}
+                    </h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'elder_detail' elder.id %}">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'elder_edit' elder.id %}">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'med_schedule_add' %}?elder_id={{ elder.id }}">
+                                <i class="fas fa-pills me-2"></i>Add Medication
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'appointment_add' %}?elder_id={{ elder.id }}">
+                                <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'care_task_add' %}?elder_id={{ elder.id }}">
+                                <i class="fas fa-tasks me-2"></i>Create Task
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'quick_vitals' elder.id %}">
+                                <i class="fas fa-heartbeat me-2"></i>Quick Vitals
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'emergency_contact_add' elder.id %}">
+                                <i class="fas fa-phone me-2"></i>Add Emergency Contact
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Basic Info -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Age</small><br>
+                            <strong>
+                                {% if elder.age %}
+                                    {{ elder.age }} years
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Gender</small><br>
+                            <strong>
+                                {% if elder.gender %}
+                                    {{ elder.get_gender_display }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    {% if elder.phone or elder.email %}
+                    <div class="mb-3">
+                        {% if elder.phone %}
+                        <div class="mb-1">
+                            <i class="fas fa-phone text-muted me-2"></i>
+                            <a href="tel:{{ elder.phone }}" class="text-decoration-none">{{ elder.phone }}</a>
+                        </div>
+                        {% endif %}
+                        {% if elder.email %}
+                        <div class="mb-1">
+                            <i class="fas fa-envelope text-muted me-2"></i>
+                            <a href="mailto:{{ elder.email }}" class="text-decoration-none">{{ elder.email|truncatechars:25 }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Medical Info -->
+                    {% if elder.medical_conditions or elder.allergies %}
+                    <div class="mb-3">
+                        {% if elder.medical_conditions %}
+                        <div class="mb-2">
+                            <small class="text-muted">Medical Conditions:</small><br>
+                            <span class="text-danger">{{ elder.medical_conditions|truncatechars:80 }}</span>
+                        </div>
+                        {% endif %}
+                        {% if elder.allergies %}
+                        <div class="mb-2">
+                            <small class="text-muted">Allergies:</small><br>
+                            <span class="text-warning">{{ elder.allergies|truncatechars:80 }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Address -->
+                    {% if elder.address %}
+                    <div class="mb-3">
+                        <small class="text-muted">Address:</small><br>
+                        <span class="text-muted">{{ elder.address|truncatechars:60 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Guardian -->
+                    <div class="mb-3">
+                        <small class="text-muted">Guardian:</small><br>
+                        <span class="text-muted">{{ elder.guardian.get_full_name|default:elder.guardian.username }}</span>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="border-end">
+                                <div class="text-primary fw-bold">
+                                                                    {% with med_count=elder.medication_schedules.all.count %}
+                                    {{ med_count }}
+                                {% endwith %}
+                                </div>
+                                <small class="text-muted">Medications</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border-end">
+                                <div class="text-success fw-bold">
+                                                                    {% with task_count=elder.care_tasks.all.count %}
+                                    {{ task_count }}
+                                {% endwith %}
+                                </div>
+                                <small class="text-muted">Tasks</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-info fw-bold">
+                                {% with appt_count=elder.appointments.all.count %}
+                                    {{ appt_count }}
+                                {% endwith %}
+                            </div>
+                            <small class="text-muted">Appointments</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {% if elder.updated_at %}
+                                Updated {{ elder.updated_at|timesince }} ago
+                            {% else %}
+                                Recently added
+                            {% endif %}
+                        </small>
+                        <a href="{% url 'elder_detail' elder.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if elders.has_other_pages %}
+    <nav aria-label="Elder profiles pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if elders.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ elders.previous_page_number }}{% if query %}&query={{ query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for num in elders.paginator.page_range %}
+                {% if elders.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > elders.number|add:'-3' and num < elders.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if query %}&query={{ query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if elders.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ elders.next_page_number }}{% if query %}&query={{ query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+{% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-users fa-5x text-muted"></i>
+        </div>
+        <h4 class="text-muted mb-3">No Elder Profiles Found</h4>
+        <p class="text-muted mb-4">
+            {% if query %}
+                No elders match your search criteria "{{ query }}".
+            {% else %}
+                Get started by adding your first elder profile to the system.
+            {% endif %}
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'elder_add' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Add First Elder
+            </a>
+            {% if query %}
+                <a href="{% url 'elder_list' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Clear Search
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Quick Actions Footer -->
+<div class="mt-5 pt-4 border-top">
+    <div class="row text-center">
+        <div class="col-md-3 mb-3">
+            <div class="quick-action-item">
+                <i class="fas fa-user-plus fa-2x text-primary mb-2"></i>
+                <h6>Add Elder</h6>
+                <p class="text-muted small">Create new elder profiles with comprehensive information</p>
+                <a href="{% url 'elder_add' %}" class="btn btn-outline-primary btn-sm">Get Started</a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="quick-action-item">
+                <i class="fas fa-pills fa-2x text-success mb-2"></i>
+                <h6>Manage Medications</h6>
+                <p class="text-muted small">Schedule and track medication administration</p>
+                <a href="{% url 'medication_add' %}" class="btn btn-outline-success btn-sm">Add Medication</a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="quick-action-item">
+                <i class="fas fa-calendar-check fa-2x text-info mb-2"></i>
+                <h6>Schedule Appointments</h6>
+                <p class="text-muted small">Book and manage healthcare appointments</p>
+                <a href="{% url 'appointment_add' %}" class="btn btn-outline-info btn-sm">Schedule Now</a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="quick-action-item">
+                <i class="fas fa-heartbeat fa-2x text-danger mb-2"></i>
+                <h6>Track Vitals</h6>
+                <p class="text-muted small">Monitor health vitals and trends</p>
+                <a href="#" class="btn btn-outline-danger btn-sm">Log Vitals</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .elder-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .elder-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .quick-action-item {
+        padding: 1.5rem;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+    }
+    
+    .quick-action-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    .elder-card .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .elder-card .dropdown-toggle::after {
+        display: none;
+    }
+    
+    .elder-card .dropdown-toggle {
+        color: rgba(255,255,255,0.8);
+        border-color: rgba(255,255,255,0.3);
+    }
+    
+    .elder-card .dropdown-toggle:hover {
+        color: white;
+        border-color: rgba(255,255,255,0.5);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to elder cards
+        const elderCards = document.querySelectorAll('.elder-card');
+        elderCards.forEach(function(card) {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            });
+        });
+        
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

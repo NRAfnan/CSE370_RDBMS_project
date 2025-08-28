@@ -1,0 +1,688 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ elder.full_name }} - Elder Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">
+            <i class="fas fa-user me-2"></i>{{ elder.full_name }}
+        </h1>
+        <p class="text-muted mb-0">
+            {% if elder.age %}
+                Age: {{ elder.age }} years old
+            {% endif %}
+            {% if elder.gender %}
+                • Gender: {{ elder.get_gender_display }}
+            {% endif %}
+            {% if elder.blood_type %}
+                • Blood Type: {{ elder.blood_type }}
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'elder_edit' elder.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-2"></i>Edit Profile
+        </a>
+        <a href="{% url 'quick_vitals' elder.id %}" class="btn btn-success">
+            <i class="fas fa-heartbeat me-2"></i>Quick Vitals
+        </a>
+        <a href="{% url 'med_schedule_add' %}?elder_id={{ elder.id }}" class="btn btn-info">
+            <i class="fas fa-pills me-2"></i>Add Medication
+        </a>
+    </div>
+</div>
+
+<!-- Elder Information Cards -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Personal Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <strong>Date of Birth:</strong><br>
+                        <span class="text-muted">
+                            {% if elder.date_of_birth %}
+                                {{ elder.date_of_birth|date:"F d, Y" }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <strong>Phone:</strong><br>
+                        <span class="text-muted">
+                            {% if elder.phone %}
+                                <a href="tel:{{ elder.phone }}">{{ elder.phone }}</a>
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <strong>Email:</strong><br>
+                        <span class="text-muted">
+                            {% if elder.email %}
+                                <a href="mailto:{{ elder.email }}">{{ elder.email }}</a>
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <strong>Guardian:</strong><br>
+                        <span class="text-muted">{{ elder.guardian.get_full_name|default:elder.guardian.username }}</span>
+                    </div>
+                </div>
+                {% if elder.address %}
+                <div class="mb-3">
+                    <strong>Address:</strong><br>
+                    <span class="text-muted">{{ elder.address }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-notes-medical me-2"></i>Medical Information
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if elder.medical_conditions %}
+                <div class="mb-3">
+                    <strong>Medical Conditions:</strong><br>
+                    <span class="text-muted">{{ elder.medical_conditions }}</span>
+                </div>
+                {% endif %}
+                
+                {% if elder.allergies %}
+                <div class="mb-3">
+                    <strong>Allergies:</strong><br>
+                    <span class="text-muted">{{ elder.allergies }}</span>
+                </div>
+                {% endif %}
+                
+                {% if elder.emergency_notes %}
+                <div class="mb-3">
+                    <strong>Emergency Notes:</strong><br>
+                    <span class="text-muted">{{ elder.emergency_notes }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="text-muted">
+                    <small>
+                        <i class="fas fa-clock me-1"></i>
+                        {% if elder.updated_at %}
+                    Profile updated: {{ elder.updated_at|timesince }} ago
+                {% else %}
+                    Profile recently added
+                {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Emergency Contacts -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fas fa-phone-alt me-2"></i>Emergency Contacts
+        </h5>
+        <a href="{% url 'emergency_contact_add' elder.id %}" class="btn btn-sm btn-outline-light">
+            <i class="fas fa-plus me-1"></i>Add Contact
+        </a>
+    </div>
+    <div class="card-body">
+        {% if emergency_contacts %}
+            <div class="row">
+                {% for contact in emergency_contacts %}
+                <div class="col-lg-6 mb-3">
+                    <div class="d-flex align-items-start p-3 border rounded">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                {{ contact.name }}
+                                {% if contact.is_primary %}
+                                    <span class="badge bg-success ms-2">Primary</span>
+                                {% endif %}
+                            </h6>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-user-tag me-1"></i>{{ contact.get_relation_display }}
+                            </p>
+                            <p class="mb-1">
+                                <a href="tel:{{ contact.phone }}" class="text-decoration-none">
+                                    <i class="fas fa-phone me-1"></i>{{ contact.phone }}
+                                </a>
+                            </p>
+                            {% if contact.phone_2 %}
+                            <p class="mb-1">
+                                <a href="tel:{{ contact.phone_2 }}" class="text-decoration-none">
+                                    <i class="fas fa-phone me-1"></i>{{ contact.phone_2 }}
+                                </a>
+                            </p>
+                            {% endif %}
+                            {% if contact.email %}
+                            <p class="mb-1">
+                                <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                    <i class="fas fa-envelope me-1"></i>{{ contact.email }}
+                                </a>
+                            </p>
+                            {% endif %}
+                            {% if contact.address %}
+                            <p class="mb-0 text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ contact.address }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-phone fa-3x mb-3"></i>
+                <p>No emergency contacts added yet</p>
+                <a href="{% url 'emergency_contact_add' elder.id %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add First Contact
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Main Content Tabs -->
+<ul class="nav nav-tabs mb-4" id="elderTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="medications-tab" data-bs-toggle="tab" data-bs-target="#medications" type="button" role="tab">
+            <i class="fas fa-pills me-2"></i>Medications
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab">
+            <i class="fas fa-calendar-check me-2"></i>Appointments
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab">
+            <i class="fas fa-tasks me-2"></i>Care Tasks
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vitals-tab" data-bs-toggle="tab" data-bs-target="#vitals" type="button" role="tab">
+            <i class="fas fa-heartbeat me-2"></i>Vitals
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="incidents-tab" data-bs-toggle="tab" data-bs-target="#incidents" type="button" role="tab">
+            <i class="fas fa-exclamation-triangle me-2"></i>Incidents
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="elderTabsContent">
+    <!-- Medications Tab -->
+    <div class="tab-pane fade show active" id="medications" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Current Medications</h5>
+            <a href="{% url 'med_schedule_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Medication Schedule
+            </a>
+        </div>
+        
+        {% if medications %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Medication</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Times</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for schedule in medications %}
+                        <tr>
+                            <td>
+                                <strong>{{ schedule.medication.name }}</strong>
+                                {% if schedule.medication.strength %}
+                                    <br><small class="text-muted">{{ schedule.medication.strength }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ schedule.dosage }}</td>
+                            <td>{{ schedule.get_frequency_display }}</td>
+                            <td>
+                                {% if schedule.time_1 %}{{ schedule.time_1|time:"g:i A" }}{% endif %}
+                                {% if schedule.time_2 %}<br>{{ schedule.time_2|time:"g:i A" }}{% endif %}
+                                {% if schedule.time_3 %}<br>{{ schedule.time_3|time:"g:i A" }}{% endif %}
+                            </td>
+                            <td>{{ schedule.start_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if schedule.end_date %}
+                                    {{ schedule.end_date|date:"M d, Y" }}
+                                {% else %}
+                                    <span class="text-muted">Ongoing</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if schedule.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'medication_log' schedule.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-check me-1"></i>Log
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-pills fa-3x mb-3"></i>
+                <p>No medications scheduled for this elder</p>
+                <a href="{% url 'med_schedule_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add First Medication
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Appointments Tab -->
+    <div class="tab-pane fade" id="appointments" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Appointments</h5>
+            <a href="{% url 'appointment_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Schedule Appointment
+            </a>
+        </div>
+        
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Date & Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>
+                                <strong>{{ appointment.title }}</strong>
+                                {% if appointment.doctor_name %}
+                                    <br><small class="text-muted">Dr. {{ appointment.doctor_name }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ appointment.get_appointment_type_display }}</span>
+                            </td>
+                            <td>{{ appointment.appointment_date|date:"M d, Y g:i A" }}</td>
+                            <td>
+                                {% if appointment.location %}
+                                    {{ appointment.location }}
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if appointment.status == 'SCHEDULED' %}
+                                    <span class="badge bg-primary">{{ appointment.status }}</span>
+                                {% elif appointment.status == 'CONFIRMED' %}
+                                    <span class="badge bg-success">{{ appointment.status }}</span>
+                                {% elif appointment.status == 'COMPLETED' %}
+                                    <span class="badge bg-secondary">{{ appointment.status }}</span>
+                                {% elif appointment.status == 'CANCELLED' %}
+                                    <span class="badge bg-danger">{{ appointment.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning">{{ appointment.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-calendar fa-3x mb-3"></i>
+                <p>No appointments scheduled for this elder</p>
+                <a href="{% url 'appointment_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Schedule First Appointment
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Care Tasks Tab -->
+    <div class="tab-pane fade" id="tasks" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Care Tasks</h5>
+            <a href="{% url 'care_task_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Task
+            </a>
+        </div>
+        
+        {% if care_tasks %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Assigned To</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in care_tasks %}
+                        <tr>
+                            <td>
+                                <strong>{{ task.title }}</strong>
+                                <br><small class="text-muted">{{ task.description|truncatechars:60 }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ task.get_task_type_display }}</span>
+                            </td>
+                            <td>
+                                {% if task.priority == 'URGENT' %}
+                                    <span class="badge bg-danger">{{ task.priority }}</span>
+                                {% elif task.priority == 'HIGH' %}
+                                    <span class="badge bg-warning">{{ task.priority }}</span>
+                                {% elif task.priority == 'MEDIUM' %}
+                                    <span class="badge bg-info">{{ task.priority }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ task.priority }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                    {{ task.due_date|date:"M d, Y" }}
+                                {% else %}
+                                    <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                    {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.status == 'PENDING' %}
+                                    <span class="badge bg-warning">{{ task.status }}</span>
+                                {% elif task.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-info">{{ task.status }}</span>
+                                {% elif task.status == 'COMPLETED' %}
+                                    <span class="badge bg-success">{{ task.status }}</span>
+                                {% elif task.status == 'OVERDUE' %}
+                                    <span class="badge bg-danger">{{ task.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ task.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.status == 'PENDING' %}
+                                    <a href="{% url 'care_task_complete' task.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-check me-1"></i>Complete
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-tasks fa-3x mb-3"></i>
+                <p>No care tasks created for this elder</p>
+                <a href="{% url 'care_task_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create First Task
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Vitals Tab -->
+    <div class="tab-pane fade" id="vitals" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Vitals History</h5>
+            <a href="{% url 'elder_vitals_add' elder.id %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Log Vitals
+            </a>
+        </div>
+        
+        {% if recent_vitals %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Blood Pressure</th>
+                            <th>Heart Rate</th>
+                            <th>Temperature</th>
+                            <th>Weight</th>
+                            <th>Oxygen</th>
+                            <th>Blood Sugar</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vitals in recent_vitals %}
+                        <tr>
+                            <td>{{ vitals.recorded_at|date:"M d, Y g:i A" }}</td>
+                            <td>
+                                {% if vitals.blood_pressure_systolic and vitals.blood_pressure_diastolic %}
+                                    {{ vitals.blood_pressure_systolic }}/{{ vitals.blood_pressure_diastolic }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.heart_rate %}
+                                    {{ vitals.heart_rate }} BPM
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.temperature %}
+                                    {{ vitals.temperature }}°F
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.weight %}
+                                    {{ vitals.weight }} lbs
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.oxygen_saturation %}
+                                    {{ vitals.oxygen_saturation }}%
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.blood_sugar %}
+                                    {{ vitals.blood_sugar }} mg/dL
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if vitals.notes %}
+                                    {{ vitals.notes|truncatechars:30 }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'elder_vitals' elder.id %}" class="btn btn-outline-primary">View All Vitals</a>
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-heartbeat fa-3x mb-3"></i>
+                <p>No vitals logged for this elder yet</p>
+                <a href="{% url 'elder_vitals_add' elder.id %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Log First Vitals
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Incidents Tab -->
+    <div class="tab-pane fade" id="incidents" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Incident Reports</h5>
+            <a href="{% url 'incident_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Report Incident
+            </a>
+        </div>
+        
+        {% if recent_incidents %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Description</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for incident in recent_incidents %}
+                        <tr>
+                            <td>{{ incident.incident_date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ incident.get_incident_type_display }}</span>
+                            </td>
+                            <td>
+                                {% if incident.severity == 'CRITICAL' %}
+                                    <span class="badge bg-danger">{{ incident.severity }}</span>
+                                {% elif incident.severity == 'HIGH' %}
+                                    <span class="badge bg-warning">{{ incident.severity }}</span>
+                                {% elif incident.severity == 'MEDIUM' %}
+                                    <span class="badge bg-info">{{ incident.severity }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ incident.severity }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ incident.description|truncatechars:60 }}</td>
+                            <td>
+                                {% if incident.location %}
+                                    {{ incident.location }}
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if incident.is_resolved %}
+                                    <span class="badge bg-success">Resolved</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Open</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'elder_incidents' elder.id %}" class="btn btn-outline-primary">View All Incidents</a>
+            </div>
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                <p>No incidents reported for this elder</p>
+                <a href="{% url 'incident_add' %}?elder_id={{ elder.id }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Report First Incident
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize tabs
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling to tabs
+        const tabLinks = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabLinks.forEach(function(tabLink) {
+            tabLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.getAttribute('data-bs-target');
+                const tab = new bootstrap.Tab(this);
+                tab.show();
+                
+                // Smooth scroll to tab content
+                document.querySelector(target).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,635 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Special Care Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'elder_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Elder
+        </a>
+        <a href="{% url 'appointment_add' %}" class="btn btn-outline-primary">
+            <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+        </a>
+    </div>
+</div>
+
+<!-- Welcome Banner with Image -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-3">
+                            <i class="fas fa-heart me-2"></i>Welcome to Eldercare Platform
+                        </h2>
+                        <p class="lead mb-3">Providing compassionate care and support for our elderly loved ones</p>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'elder_add' %}" class="btn btn-light">
+                                <i class="fas fa-user-plus me-2"></i>Add New Elder
+                            </a>
+                            <a href="{% url 'vitals_add' %}" class="btn btn-outline-light">
+                                <i class="fas fa-heartbeat me-2"></i>Log Vitals
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="welcome-icon">
+                            <div class="animated-care-scene">
+                                <i class="fas fa-heartbeat pulse-animation" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 10px;"></i>
+                                <div class="care-icons">
+                                    <i class="fas fa-user-md bounce-animation" style="font-size: 2.5rem; color: #4ecdc4; margin: 0 5px;"></i>
+                                    <i class="fas fa-hands-helping bounce-animation-delay" style="font-size: 2.5rem; color: #45b7d1; margin: 0 5px;"></i>
+                                    <i class="fas fa-home bounce-animation-delay-2" style="font-size: 2.5rem; color: #96ceb4; margin: 0 5px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0" style="font-size: 0.9rem; opacity: 0.9;">
+                            <i class="fas fa-star me-1"></i>Compassionate Care in Action
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="number">{{ total_elders }}</div>
+                <div class="label">Total Elders</div>
+                <i class="fas fa-users text-muted mt-2" style="font-size: 2rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="number">{{ today_medications.count }}</div>
+                <div class="label">Today's Medications</div>
+                <i class="fas fa-pills text-muted mt-2" style="font-size: 2rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="number">{{ pending_tasks.count }}</div>
+                <div class="label">Pending Tasks</div>
+                <i class="fas fa-tasks text-muted mt-2" style="font-size: 2rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="number">{{ upcoming_appointments.count }}</div>
+                <div class="label">Upcoming Appointments</div>
+                <i class="fas fa-calendar-check text-muted mt-2" style="font-size: 2rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <h5 class="mb-3">
+        <i class="fas fa-bolt me-2"></i>Quick Actions
+    </h5>
+    <div class="row g-3">
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'elder_add' %}" class="quick-action-btn">
+                <i class="fas fa-user-plus"></i>
+                <span class="text-center">Add Elder</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'appointment_add' %}" class="quick-action-btn">
+                <i class="fas fa-calendar-plus"></i>
+                <span class="text-center">Schedule Appointment</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'care_task_add' %}" class="quick-action-btn">
+                <i class="fas fa-clipboard-list"></i>
+                <span class="text-center">Create Task</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'incident_add' %}" class="quick-action-btn">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="text-center">Report Incident</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'medication_add' %}" class="quick-action-btn">
+                <i class="fas fa-pills"></i>
+                <span class="text-center">Add Medication</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'search' %}" class="quick-action-btn">
+                <i class="fas fa-search"></i>
+                <span class="text-center">Search</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Today's Medications -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-pills me-2"></i>Today's Medications
+                </h5>
+                <a href="#" class="btn btn-sm btn-outline-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if today_medications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Elder</th>
+                                    <th>Medication</th>
+                                    <th>Dosage</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in today_medications %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'elder_detail' schedule.elder.id %}" class="text-decoration-none">
+                                            {{ schedule.elder.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ schedule.medication.name }}</td>
+                                    <td>{{ schedule.dosage }}</td>
+                                    <td>
+                                        {% if schedule.time_1 %}
+                                            {{ schedule.time_1|time:"g:i A" }}
+                                        {% endif %}
+                                        {% if schedule.time_2 %}
+                                            <br>{{ schedule.time_2|time:"g:i A" }}
+                                        {% endif %}
+                                        {% if schedule.time_3 %}
+                                            <br>{{ schedule.time_3|time:"g:i A" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">Due</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'medication_log' schedule.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-check me-1"></i>Log
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-pills fa-3x mb-3"></i>
+                        <p>No medications scheduled for today</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pending Care Tasks -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks me-2"></i>Pending Care Tasks
+                </h5>
+                <a href="{% url 'care_task_list' %}" class="btn btn-sm btn-outline-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if pending_tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Elder</th>
+                                    <th>Priority</th>
+                                    <th>Due Date</th>
+                                    <th>Assigned To</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in pending_tasks %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ task.title }}</strong>
+                                        <br><small class="text-muted">{{ task.description|truncatechars:50 }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'elder_detail' task.elder.id %}" class="text-decoration-none">
+                                            {{ task.elder.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if task.priority == 'URGENT' %}
+                                            <span class="badge bg-danger">{{ task.priority }}</span>
+                                        {% elif task.priority == 'HIGH' %}
+                                            <span class="badge bg-warning">{{ task.priority }}</span>
+                                        {% elif task.priority == 'MEDIUM' %}
+                                            <span class="badge bg-info">{{ task.priority }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ task.priority }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.due_date %}
+                                            {{ task.due_date|date:"M d, Y" }}
+                                        {% else %}
+                                            <span class="text-muted">No due date</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.assigned_to %}
+                                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                        {% else %}
+                                            <span class="text-muted">Unassigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'care_task_complete' task.id %}" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-check me-1"></i>Complete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-tasks fa-3x mb-3"></i>
+                        <p>No pending tasks</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Upcoming Appointments -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-check me-2"></i>Upcoming Appointments
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_appointments %}
+                    {% for appointment in upcoming_appointments %}
+                    <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ appointment.title }}</h6>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-user me-1"></i>{{ appointment.elder.full_name }}
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-clock me-1"></i>{{ appointment.appointment_date|date:"M d, Y g:i A" }}
+                            </p>
+                            {% if appointment.location %}
+                            <p class="mb-0 text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ appointment.location }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <a href="{% url 'appointment_list' %}" class="btn btn-outline-primary btn-sm">View All Appointments</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                        <p>No upcoming appointments</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Vitals Due -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-heartbeat me-2"></i>Vitals Due
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if vitals_due %}
+                    <div class="list-group list-group-flush">
+                        {% for elder in vitals_due %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <div>
+                                <h6 class="mb-1">{{ elder.full_name }}</h6>
+                                <small class="text-muted">Vitals due today</small>
+                            </div>
+                            <a href="{% url 'quick_vitals' elder.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-plus me-1"></i>Log
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-heartbeat fa-2x mb-2"></i>
+                        <p>All vitals are up to date</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Incidents -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Recent Incidents
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_incidents %}
+                    {% for incident in recent_incidents %}
+                    <div class="d-flex align-items-start mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="flex-shrink-0 me-3">
+                            {% if incident.severity == 'CRITICAL' %}
+                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-exclamation"></i>
+                                </div>
+                            {% elif incident.severity == 'HIGH' %}
+                                <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                            {% else %}
+                                <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-info"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ incident.incident_type|title }}</h6>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-user me-1"></i>{{ incident.elder.full_name }}
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-clock me-1"></i>{{ incident.incident_date|date:"M d, Y" }}
+                            </p>
+                            <p class="mb-0 text-muted">
+                                {{ incident.description|truncatechars:60 }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <a href="{% url 'incident_list' %}" class="btn btn-outline-primary btn-sm">View All Incidents</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <p>No recent incidents</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Notifications -->
+{% if notifications %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-bell me-2"></i>Recent Notifications
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="list-group list-group-flush">
+            {% for notification in notifications %}
+            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                        {% if notification.priority == 'HIGH' %}
+                            <i class="fas fa-exclamation-circle text-danger"></i>
+                        {% elif notification.priority == 'MEDIUM' %}
+                            <i class="fas fa-info-circle text-warning"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle text-info"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} ago
+                        </small>
+                    </div>
+                </div>
+                <a href="{% url 'notification_mark_read' notification.id %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-check me-1"></i>Mark Read
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'notification_list' %}" class="btn btn-outline-primary">View All Notifications</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Animated Care Scene */
+    .animated-care-scene {
+        position: relative;
+        padding: 20px;
+    }
+    
+    /* Pulse animation for heartbeat */
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Bounce animations for care icons */
+    .bounce-animation {
+        animation: bounce 2s infinite;
+    }
+    
+    .bounce-animation-delay {
+        animation: bounce 2s infinite 0.5s;
+    }
+    
+    .bounce-animation-delay-2 {
+        animation: bounce 2s infinite 1s;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+    
+    /* Care icons container */
+    .care-icons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    /* Enhanced gradient background */
+    .card[style*="linear-gradient"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card[style*="linear-gradient"]::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Enhanced quick action buttons */
+    .quick-action-btn {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .quick-action-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .quick-action-btn:hover::before {
+        left: 100%;
+    }
+    
+    /* Stats cards enhancement */
+    .stats-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .stats-card .number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        animation: countUp 1s ease-out;
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add some interactivity to the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-refresh dashboard every 5 minutes
+        setInterval(function() {
+            location.reload();
+        }, 300000);
+        
+        // Add click handlers for quick actions
+        document.querySelectorAll('.quick-action-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                // Add a small animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+        
+        // Add entrance animations for stats cards
+        const statsCards = document.querySelectorAll('.stats-card');
+        statsCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.animation = 'slideInUp 0.6s ease-out forwards';
+        });
+    });
+    
+    // Add slide-in animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

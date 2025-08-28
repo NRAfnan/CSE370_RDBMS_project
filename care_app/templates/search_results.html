@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - Eldercare Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-search me-2"></i>Search Results
+                </h1>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" name="query" value="{{ query }}" placeholder="Search elders, medications, tasks...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" name="category">
+                                <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
+                                <option value="elders" {% if category == 'elders' %}selected{% endif %}>Elders</option>
+                                <option value="medications" {% if category == 'medications' %}selected{% endif %}>Medications</option>
+                                <option value="tasks" {% if category == 'tasks' %}selected{% endif %}>Tasks</option>
+                                <option value="appointments" {% if category == 'appointments' %}selected{% endif %}>Appointments</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if query %}
+            <div class="mb-4">
+                <h5>Search Results for: <span class="text-primary">"{{ query }}"</span></h5>
+                <small class="text-muted">Found results across {{ results|length }} categories</small>
+            </div>
+
+            <!-- Search Results -->
+            {% if results %}
+                <!-- Elders Results -->
+                {% if results.elders %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Elders ({{ results.elders.count }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for elder in results.elders %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <a href="{% url 'elder_detail' elder.id %}">{{ elder.full_name }}</a>
+                                        </h6>
+                                        <p class="card-text small text-muted">
+                                            {% if elder.medical_conditions %}
+                                                {{ elder.medical_conditions|truncatechars:50 }}
+                                            {% else %}
+                                                No medical conditions listed
+                                            {% endif %}
+                                        </p>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">{{ elder.address|truncatechars:30 }}</small>
+                                            <a href="{% url 'elder_detail' elder.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Medications Results -->
+                {% if results.medications %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-pills me-2"></i>Medications ({{ results.medications.count }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Medication</th>
+                                        <th>Elder</th>
+                                        <th>Dosage</th>
+                                        <th>Frequency</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for schedule in results.medications %}
+                                    <tr>
+                                        <td>{{ schedule.medication.name }}</td>
+                                        <td>{{ schedule.elder.full_name }}</td>
+                                        <td>{{ schedule.dosage }}</td>
+                                        <td>{{ schedule.frequency }}</td>
+                                        <td>
+                                            <a href="{% url 'elder_detail' schedule.elder.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Tasks Results -->
+                {% if results.tasks %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-tasks me-2"></i>Care Tasks ({{ results.tasks.count }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for task in results.tasks %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ task.title }}</h6>
+                                        <p class="card-text small">{{ task.description|truncatechars:80 }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-{% if task.status == 'COMPLETED' %}success{% elif task.status == 'PENDING' %}warning{% else %}secondary{% endif %}">
+                                                {{ task.status }}
+                                            </span>
+                                            <small class="text-muted">{{ task.elder.full_name }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Appointments Results -->
+                {% if results.appointments %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar me-2"></i>Appointments ({{ results.appointments.count }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Elder</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in results.appointments %}
+                                    <tr>
+                                        <td>{{ appointment.title }}</td>
+                                        <td>{{ appointment.elder.full_name }}</td>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y g:i A" }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if appointment.status == 'COMPLETED' %}success{% elif appointment.status == 'SCHEDULED' %}primary{% else %}secondary{% endif %}">
+                                                {{ appointment.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'elder_detail' appointment.elder.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No results found</h5>
+                    <p class="text-muted">Try adjusting your search terms or category filter.</p>
+                </div>
+            {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Enter a search term</h5>
+                    <p class="text-muted">Use the search form above to find elders, medications, tasks, or appointments.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

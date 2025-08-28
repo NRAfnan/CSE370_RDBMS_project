@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Quick Vitals - {{ elder.full_name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Quick Vitals - {{ elder.full_name }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Quick Entry:</strong> Log essential vital signs quickly for {{ elder.full_name }}. 
+            This form captures the most important health metrics.
+          </div>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+              <!-- Blood Pressure -->
+              <div class="col-md-6">
+                <label for="{{ form.blood_pressure_systolic.id_for_label }}" class="form-label">
+                  <i class="fas fa-tint me-1"></i>Blood Pressure (Systolic)
+                </label>
+                {{ form.blood_pressure_systolic }}
+                {% if form.blood_pressure_systolic.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.blood_pressure_systolic.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 90-140 mmHg</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.blood_pressure_diastolic.id_for_label }}" class="form-label">
+                  <i class="fas fa-tint me-1"></i>Blood Pressure (Diastolic)
+                </label>
+                {{ form.blood_pressure_diastolic }}
+                {% if form.blood_pressure_diastolic.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.blood_pressure_diastolic.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 60-90 mmHg</div>
+              </div>
+
+              <!-- Heart Rate & Temperature -->
+              <div class="col-md-6">
+                <label for="{{ form.heart_rate.id_for_label }}" class="form-label">
+                  <i class="fas fa-heart me-1"></i>Heart Rate
+                </label>
+                {{ form.heart_rate }}
+                {% if form.heart_rate.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.heart_rate.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 60-100 bpm</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.temperature.id_for_label }}" class="form-label">
+                  <i class="fas fa-thermometer-half me-1"></i>Temperature
+                </label>
+                {{ form.temperature }}
+                {% if form.temperature.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.temperature.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 97.8-99.0°F</div>
+              </div>
+
+              <!-- Weight & Oxygen -->
+              <div class="col-md-6">
+                <label for="{{ form.weight.id_for_label }}" class="form-label">
+                  <i class="fas fa-weight me-1"></i>Weight
+                </label>
+                {{ form.weight }}
+                {% if form.weight.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.weight.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">In pounds (lbs)</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="{{ form.oxygen_saturation.id_for_label }}" class="form-label">
+                  <i class="fas fa-lungs me-1"></i>Oxygen Saturation
+                </label>
+                {{ form.oxygen_saturation }}
+                {% if form.oxygen_saturation.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.oxygen_saturation.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 95-100%</div>
+              </div>
+
+              <!-- Blood Sugar -->
+              <div class="col-md-6">
+                <label for="{{ form.blood_sugar.id_for_label }}" class="form-label">
+                  <i class="fas fa-tint me-1"></i>Blood Sugar
+                </label>
+                {{ form.blood_sugar }}
+                {% if form.blood_sugar.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.blood_sugar.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Normal: 70-140 mg/dL</div>
+              </div>
+
+              <!-- Notes -->
+              <div class="col-12">
+                <label for="{{ form.notes.id_for_label }}" class="form-label">
+                  <i class="fas fa-sticky-note me-1"></i>Notes
+                </label>
+                {{ form.notes }}
+                {% if form.notes.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.notes.errors.0 }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Any observations or concerns</div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'elder_vitals' elder.id %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Vitals
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i>Save Vitals
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Reference Card -->
+      <div class="card mt-3 border-info">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Vital Signs Reference</h6>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <small class="text-muted">Blood Pressure</small><br>
+              <strong>120/80 mmHg</strong>
+            </div>
+            <div class="col-md-3">
+              <small class="text-muted">Heart Rate</small><br>
+              <strong>60-100 bpm</strong>
+            </div>
+            <div class="col-md-3">
+              <small class="text-muted">Temperature</small><br>
+              <strong>98.6°F</strong>
+            </div>
+            <div class="col-md-3">
+              <small class="text-muted">Oxygen</small><br>
+              <strong>95-100%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

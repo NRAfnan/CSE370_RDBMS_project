@@ -1,0 +1,1 @@
+Static files (CSS/JS) can be placed here. Using Bootstrap CDN in templates.

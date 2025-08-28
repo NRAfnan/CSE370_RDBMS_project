@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Eldercare Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-heartbeat me-2"></i>{{ title }}
+                </h1>
+                {% if elder %}
+                    <a href="{% url 'elder_detail' elder.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to {{ elder.name }}
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                {% if elder %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-user me-2"></i>
+                                        <strong>Elder:</strong> {{ elder.name }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.elder.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user me-1"></i>Elder
+                                            </label>
+                                            {{ form.elder }}
+                                            {% if form.elder.errors %}
+                                                <div class="text-danger small">{{ form.elder.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.recorded_at.id_for_label }}" class="form-label">
+                                                <i class="fas fa-calendar me-1"></i>Date & Time
+                                            </label>
+                                            {{ form.recorded_at }}
+                                            {% if form.recorded_at.errors %}
+                                                <div class="text-danger small">{{ form.recorded_at.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-stethoscope me-2"></i>Vital Signs
+                                </h5>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.blood_pressure_systolic.id_for_label }}" class="form-label">
+                                                <i class="fas fa-heartbeat me-1"></i>Blood Pressure (Systolic)
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.blood_pressure_systolic }}
+                                                <span class="input-group-text">mmHg</span>
+                                            </div>
+                                            {% if form.blood_pressure_systolic.errors %}
+                                                <div class="text-danger small">{{ form.blood_pressure_systolic.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.blood_pressure_diastolic.id_for_label }}" class="form-label">
+                                                <i class="fas fa-heartbeat me-1"></i>Blood Pressure (Diastolic)
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.blood_pressure_diastolic }}
+                                                <span class="input-group-text">mmHg</span>
+                                            </div>
+                                            {% if form.blood_pressure_diastolic.errors %}
+                                                <div class="text-danger small">{{ form.blood_pressure_diastolic.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.heart_rate.id_for_label }}" class="form-label">
+                                                <i class="fas fa-heart me-1"></i>Heart Rate
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.heart_rate }}
+                                                <span class="input-group-text">bpm</span>
+                                            </div>
+                                            {% if form.heart_rate.errors %}
+                                                <div class="text-danger small">{{ form.heart_rate.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.temperature.id_for_label }}" class="form-label">
+                                                <i class="fas fa-thermometer-half me-1"></i>Temperature
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.temperature }}
+                                                <span class="input-group-text">°F</span>
+                                            </div>
+                                            {% if form.temperature.errors %}
+                                                <div class="text-danger small">{{ form.temperature.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.weight.id_for_label }}" class="form-label">
+                                                <i class="fas fa-weight me-1"></i>Weight
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.weight }}
+                                                <span class="input-group-text">lbs</span>
+                                            </div>
+                                            {% if form.weight.errors %}
+                                                <div class="text-danger small">{{ form.weight.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.blood_sugar.id_for_label }}" class="form-label">
+                                                <i class="fas fa-tint me-1"></i>Blood Sugar
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.blood_sugar }}
+                                                <span class="input-group-text">mg/dL</span>
+                                            </div>
+                                            {% if form.blood_sugar.errors %}
+                                                <div class="text-danger small">{{ form.blood_sugar.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.oxygen_saturation.id_for_label }}" class="form-label">
+                                                <i class="fas fa-lungs me-1"></i>Oxygen Saturation
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.oxygen_saturation }}
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                            {% if form.oxygen_saturation.errors %}
+                                                <div class="text-danger small">{{ form.oxygen_saturation.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                        <i class="fas fa-sticky-note me-1"></i>Notes
+                                    </label>
+                                    {{ form.notes }}
+                                    {% if form.notes.errors %}
+                                        <div class="text-danger small">{{ form.notes.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% if elder %}{% url 'elder_detail' elder.id %}{% else %}{% url 'vitals_list' %}{% endif %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Save Vitals
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Guidelines
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">Blood Pressure</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>Normal:</strong> <120/80 mmHg</li>
+                                    <li><strong>Elevated:</strong> 120-129/<80 mmHg</li>
+                                    <li><strong>High:</strong> ≥130/≥80 mmHg</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-primary">Heart Rate</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>Normal:</strong> 60-100 bpm</li>
+                                    <li><strong>Resting:</strong> 60-100 bpm</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-primary">Temperature</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>Normal:</strong> 97.8-99.0°F</li>
+                                    <li><strong>Fever:</strong> >100.4°F</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-primary">Blood Sugar</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>Normal:</strong> 70-140 mg/dL</li>
+                                    <li><strong>High:</strong> >140 mg/dL</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-primary">Oxygen Saturation</h6>
+                                <ul class="list-unstyled small">
+                                    <li><strong>Normal:</strong> 95-100%</li>
+                                    <li><strong>Low:</strong> <95%</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-fill current date and time
+document.addEventListener('DOMContentLoaded', function() {
+    const recordedAtField = document.getElementById('{{ form.recorded_at.id_for_label }}');
+    if (recordedAtField && !recordedAtField.value) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        recordedAtField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+});
+</script>
+{% endblock %}

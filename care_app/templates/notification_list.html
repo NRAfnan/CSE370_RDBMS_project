@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Eldercare Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-bell me-2"></i>Notifications
+                </h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="filterNotifications('all')">
+                        All
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" onclick="filterNotifications('unread')">
+                        Unread
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="filterNotifications('read')">
+                        Read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search notifications...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="typeFilter">
+                                <option value="">All Types</option>
+                                <option value="MEDICATION">Medication</option>
+                                <option value="APPOINTMENT">Appointment</option>
+                                <option value="TASK">Task</option>
+                                <option value="VITALS">Vitals</option>
+                                <option value="INCIDENT">Incident</option>
+                                <option value="GENERAL">General</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="priorityFilter">
+                                <option value="">All Priorities</option>
+                                <option value="HIGH">High</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="LOW">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div class="card">
+                <div class="card-body p-0">
+                    {% if notifications %}
+                        <div class="list-group list-group-flush" id="notificationsList">
+                            {% for notification in notifications %}
+                            <div class="list-group-item notification-item" 
+                                 data-type="{{ notification.notification_type }}" 
+                                 data-priority="{{ notification.priority }}"
+                                 data-read="{{ notification.is_read|yesno:'read,unread' }}">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <div class="notification-icon">
+                                            {% if notification.notification_type == 'MEDICATION' %}
+                                                <i class="fas fa-pills text-primary"></i>
+                                            {% elif notification.notification_type == 'APPOINTMENT' %}
+                                                <i class="fas fa-calendar-alt text-info"></i>
+                                            {% elif notification.notification_type == 'TASK' %}
+                                                <i class="fas fa-tasks text-warning"></i>
+                                            {% elif notification.notification_type == 'VITALS' %}
+                                                <i class="fas fa-heartbeat text-danger"></i>
+                                            {% elif notification.notification_type == 'INCIDENT' %}
+                                                <i class="fas fa-exclamation-triangle text-danger"></i>
+                                            {% else %}
+                                                <i class="fas fa-bell text-secondary"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 {% if not notification.is_read %}fw-bold{% endif %}">
+                                                    {{ notification.title }}
+                                                    {% if not notification.is_read %}
+                                                        <span class="badge bg-primary ms-2">New</span>
+                                                    {% endif %}
+                                                    {% if notification.priority == 'HIGH' %}
+                                                        <span class="badge bg-danger ms-1">High Priority</span>
+                                                    {% elif notification.priority == 'MEDIUM' %}
+                                                        <span class="badge bg-warning ms-1">Medium Priority</span>
+                                                    {% endif %}
+                                                </h6>
+                                                <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ notification.created_at|timesince }} ago
+                                                    {% if notification.elder %}
+                                                        • <i class="fas fa-user me-1"></i>{{ notification.elder.name }}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    {% if not notification.is_read %}
+                                                        <li>
+                                                            <a class="dropdown-item" href="#" onclick="markAsRead({{ notification.id }})">
+                                                                <i class="fas fa-check me-2"></i>Mark as Read
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="viewDetails({{ notification.id }})">
+                                                            <i class="fas fa-eye me-2"></i>View Details
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" onclick="deleteNotification({{ notification.id }})">
+                                                            <i class="fas fa-trash me-2"></i>Delete
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No notifications found</h5>
+                            <p class="text-muted">You're all caught up! Check back later for new updates.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if notifications.has_other_pages %}
+            <nav aria-label="Notifications pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if notifications.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notifications.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in notifications.paginator.page_range %}
+                        {% if notifications.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if notifications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notifications.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mark All as Read Modal -->
+<div class="modal fade" id="markAllReadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mark All as Read</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to mark all notifications as read?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="markAllAsRead()">Mark All as Read</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const notifications = document.querySelectorAll('.notification-item');
+    
+    notifications.forEach(item => {
+        const title = item.querySelector('h6').textContent.toLowerCase();
+        const message = item.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || message.includes(searchTerm)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Filter by type
+document.getElementById('typeFilter').addEventListener('change', function() {
+    filterNotifications();
+});
+
+// Filter by priority
+document.getElementById('priorityFilter').addEventListener('change', function() {
+    filterNotifications();
+});
+
+function filterNotifications(status = 'all') {
+    const typeFilter = document.getElementById('typeFilter').value;
+    const priorityFilter = document.getElementById('priorityFilter').value;
+    const notifications = document.querySelectorAll('.notification-item');
+    
+    notifications.forEach(item => {
+        const type = item.dataset.type;
+        const priority = item.dataset.priority;
+        const readStatus = item.dataset.read;
+        
+        let show = true;
+        
+        // Status filter
+        if (status === 'unread' && readStatus === 'read') show = false;
+        if (status === 'read' && readStatus === 'unread') show = false;
+        
+        // Type filter
+        if (typeFilter && type !== typeFilter) show = false;
+        
+        // Priority filter
+        if (priorityFilter && priority !== priorityFilter) show = false;
+        
+        item.style.display = show ? '' : 'none';
+    });
+}
+
+function markAsRead(notificationId) {
+    fetch(`/notifications/${notificationId}/mark-read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function markAllAsRead() {
+    fetch('/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function deleteNotification(notificationId) {
+    if (confirm('Are you sure you want to delete this notification?')) {
+        fetch(`/notifications/${notificationId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function viewDetails(notificationId) {
+    window.location.href = `/notifications/${notificationId}/`;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

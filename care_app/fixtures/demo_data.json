@@ -1,0 +1,116 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "guardian1",
+      "password": "pbkdf2_sha256$260000$uXbQvJQ0Zf0q$wOV...fakehash...", 
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true,
+      "email": "guardian1@example.com"
+    }
+  },
+  {
+    "model": "care_app.elderprofile",
+    "pk": 1,
+    "fields": {
+      "guardian": 1,
+      "full_name": "John Doe",
+      "date_of_birth": "1945-07-20",
+      "address": "123 Main St, Springfield",
+      "medical_conditions": "Hypertension",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "care_app.medication",
+    "pk": 1,
+    "fields": {
+      "name": "Aspirin",
+      "description": "Used to reduce fever and pain"
+    }
+  },
+  {
+    "model": "care_app.medicationschedule",
+    "pk": 1,
+    "fields": {
+      "elder": 1,
+      "medication": 1,
+      "dosage": "75 mg",
+      "frequency": "Once daily",
+      "start_date": "2025-01-01",
+      "end_date": "2025-12-31"
+    }
+  },
+  {
+    "model": "care_app.appointment",
+    "pk": 1,
+    "fields": {
+      "elder": 1,
+      "title": "Doctor Visit",
+      "appointment_date": "2025-08-20T10:00:00Z",
+      "location": "Health Clinic",
+      "notes": "Routine checkup"
+    }
+  },
+  {
+    "model": "care_app.caretask",
+    "pk": 1,
+    "fields": {
+      "elder": 1,
+      "description": "Check blood pressure",
+      "frequency": "Daily",
+      "assigned_to": 1,
+      "status": "pending"
+    }
+  },
+{
+  "model": "care_app.emergencycontact",
+  "pk": 1,
+  "fields": {
+    "name": "John Doe",
+    "phone": "123456789",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "elder": 1
+   }
+},
+  {
+    "model": "care_app.vitalslog",
+    "pk": 1,
+    "fields": {
+      "elder": 1,
+      "recorded_at": "2025-08-10T08:00:00Z",
+      "blood_pressure_systolic": 120,
+      "blood_pressure_diastolic": 80,
+      "heart_rate": 72,
+      "temperature": "36.6",
+      "notes": "All normal"
+    }
+  },
+{
+  "model": "care_app.incidentreport",
+  "pk": 1,
+  "fields": {
+    "elder": 1,
+    "incident_type": "FALL",
+    "incident_date": "2025-07-15T14:00:00Z",
+    "report_date": "2025-07-15T14:05:00Z",
+    "description": "Minor fall, no injury",
+    "severity": "LOW"
+  }
+},
+  {
+    "model": "care_app.notification",
+    "pk": 1,
+    "fields": {
+      "elder": 1,
+      "message": "Blood pressure check due",
+      "is_read": false,
+      "created_at": "2025-08-10T08:00:00Z"
+    }
+  }
+]
+

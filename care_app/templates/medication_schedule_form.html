@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ title|default:'Add Medication Schedule' }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-clock me-2"></i>{{ title|default:'Add Medication Schedule' }}</h5>
+        </div>
+        <div class="card-body">
+          {% if elder %}
+            <div class="alert alert-info mb-3">
+              <i class="fas fa-user me-2"></i>Elder: <strong>{{ elder.full_name }}</strong>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+              {{ form.as_p }}
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+              {% if elder %}
+                <a href="{% url 'medication_list' %}?elder_id={{ elder.id }}" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left me-1"></i>Back to Medications
+                </a>
+              {% else %}
+                <a href="{% url 'medication_list' %}" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left me-1"></i>Back to Medications
+                </a>
+              {% endif %}
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i>Save Schedule
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
